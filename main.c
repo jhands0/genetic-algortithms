@@ -52,9 +52,28 @@ Chromosome *generate_population() {
         }
         chromosomes[i].id = i;
         chromosomes[i].fitness = calculate_fitness(chromosomes[i]);
-        printf_chromosome(chromosomes[i]);
     }
     return chromosomes;
+}
+
+Chromosome get_average_fitness(Chromosome *population) {
+    double average = 0;
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        average = average + population[i].fitness;
+    }
+    return average / POPULATION_SIZE;
+}
+
+Chromosome get_best_chromosome(Chromosome *population, int size) {
+    double max_fitness = 0.0;
+    int winner_index = 0;
+    for (int c = 0; c < size; c++) {
+        if (population[c].fitness > max_fitness) {
+            max_fitness = population[c].fitness;
+            winner_index = c;
+        }
+    }
+    return population[winner_index];
 }
 
 int main(int argc, char **argv) {
