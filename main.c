@@ -3,13 +3,14 @@
 #include <math.h>
 #include <time.h>
 
-#define GENE_COUNT  3
-#define LOW        -5.
-#define HIGH        5.
+#define GENE_COUNT      3
+#define POPULATION_SIZE 100
+#define LOW            -5.
+#define HIGH            5.
 
 int random_int(int low, int high) {
-    int diff = high - low
-    return (rand() % diff) - low;
+    int diff = high - low;
+    return (rand() % diff) + low;
 }
 
 double random_double(double low, double high) {
@@ -23,30 +24,43 @@ double normal_distribution() {
 }
 
 typedef struct {
+    int id;
     double genes[GENE_COUNT];
     double fitness;
-    double (*calc_function)(Chromosome *);
-    double (*calc_fitness)(Chromosome *);
-    double (*print)(Chromosome *);
 } Chromosome;
 
-double calculate_function(Chromosome *self) {
-    double value = 100. * pow((self->genes[1] - pow(self->genes[0], 2.)),2.) + pow((1. - self->genes[0]), 2.)
-                 + 100. * pow((self->genes[2] - pow(self->genes[1], 2.)),2.) + pow((1. - self->genes[1]), 2.);
+double calculate_function(Chromosome chromosome) {
+    double value = 100. * pow((chromosome.genes[1] - pow(chromosome.genes[0], 2.)),2.) + pow((1. - chromosome.genes[0]), 2.)
+                 + 100. * pow((chromosome.genes[2] - pow(chromosome.genes[1], 2.)),2.) + pow((1. - chromosome.genes[1]), 2.);
     return value;
 }
 
-double calculate_fitness(Chromosome *self) {
-    double value = self->calc_function(self);
+double calculate_fitness(Chromosome chromosome) {
+    double value = calculate_function(chromosome);
     return 1. / (1. + fabs(value));
 }
 
-void printf_chromosome(Chromosome *self) {
-    printf("%lf : %lf, %lf, %lf\n", self->fitness, self->genes[0], self->genes[1], self->genes[2]);
+void printf_chromosome(Chromosome chromosome) {
+    printf("%d: %lf : %lf, %lf, %lf\n", chromosome.id, chromosome.fitness, chromosome.genes[0], chromosome.genes[1], chromosome.genes[2]);
+}
+
+Chromosome *generate_population() {
+    Chromosome *chromosomes = (Chromosome*) calloc(POPULATION_SIZE, sizeof(Chromosome));
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        for (int j = 0; j < GENE_COUNT; j++) {
+            chromosomes[i].genes[j] = random_double(LOW, HIGH);
+        }
+        chromosomes[i].id = i;
+        chromosomes[i].fitness = calculate_fitness(chromosomes[i]);
+        printf_chromosome(chromosomes[i]);
+    }
+    return chromosomes;
 }
 
 int main(int argc, char **argv) {
     srand((unsigned int) time(NULL));
     FILE *out_file = fopen("fitness_values.txt", "w");
     fprintf(out_file, "AVERAGE\tBEST\n");
+
+    Chromosome *population = generate_population();
 }
