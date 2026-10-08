@@ -3,10 +3,13 @@
 #include <math.h>
 #include <time.h>
 
-#define GENE_COUNT      3
-#define POPULATION_SIZE 100
-#define LOW            -5.
-#define HIGH            5.
+#define GENE_COUNT          3
+#define POPULATION_SIZE     100
+#define TOURNAMENT_SIZE     10
+#define CROSSOVER_CHANCE    0.7
+#define MUTATION_CHANCE     0.3
+#define LOW                 -5.
+#define HIGH                5.
 
 int random_int(int low, int high) {
     int diff = high - low;
@@ -74,6 +77,78 @@ Chromosome get_best_chromosome(Chromosome *population, int size) {
         }
     }
     return population[winner_index];
+}
+
+Chromosome *tournament_selection(Chromosome *population) {
+    Chromosome *new_population = (Chromosome*) calloc(POPULATION_SIZE, sizeof(Chromosome));
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        Chromosome tournament_chromasomes[TOURNAMENT_SIZE];
+        for (int t = 0; t < TOURNAMENT_SIZE; t++) {
+            int index = random_int(0, POPULATION_SIZE);
+            tournament_chromasomes[t] = population[index];
+        }
+        new_population[i] = get_best_chromosome(tournament_chromasomes, TOURNAMENT_SIZE);
+    }
+    return new_population;
+}
+
+Chromosome *uniform_crossover(Chromosome *population) {
+    Chromosome *new_population = (Chromosome*) calloc(POPULATION_SIZE, sizeof(Chromosome));
+    for (int i = 0; i < POPULATION_SIZE / 2; i++) {
+        Chromosome chr_1 = population[random_int(0, POPULATION_SIZE)];
+        Chromosome chr_2 = population[random_int(0, POPULATION_SIZE)];
+        if (random_double(0., 1.) < CROSSOVER_CHANCE) {
+            double genes_1[GENE_COUNT];
+            double genes_2[GENE_COUNT];
+            for (int j = 0; j < GENE_COUNT; j++) {
+                if (random_double(0., 1.) < 0.5) {
+                    genes_1[j] = chr_1.genes[j];
+                } else {
+                    genes_1[j] = chr_2.genes[j];
+                }
+                if (random_double(0., 1.) < 0.5) {
+                    genes_2[j] = chr_1.genes[j];
+                } else {
+                    genes_2[j] = chr_2.genes[j];
+                }
+            }
+            Chromosome new_chr_1, new_chr_2;
+            for (int j = 0; j < GENE_COUNT; j++) {
+                new_chr_1.genes[j] = genes_1[j];
+                new_chr_2.genes[j] = genes_2[j];
+            }
+            new_chr_1.fitness = calculate_fitness(new_chr_1);
+            new_chr_2.fitness = calculate_fitness(new_chr_2);
+            new_population[i] = new_chr_1;
+            new_population[POPULATION_SIZE - 1 - i] = new_chr_2;
+        } else {
+            new_population[i] = chr_1;
+            new_population[POPULATION_SIZE - 1 - i] = chr_2;
+        }
+    }
+    return new_population;
+}
+
+Chromosome *gaussian_mutation(Chromosome *population) {
+    Chromosome *new_population = (Chromosome*) calloc(POPULATION_SIZE, sizeof(Chromosome));
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        double new_genes[GENE_COUNT];
+        for (int j = 0; j < GENE_COUNT; j++) {
+            double old_gene = population[i].genes[j];
+            if (random_double(0., 1.) < MUTATION_CHANCE) {
+                new_genes[j] = old_gene + normal_distribution() * 0.1 * (HIGH - LOW);
+            } else {
+                new_genes[j] = old_gene;
+            }
+        }
+        Chromosome new_chromosome;
+        for (int j = 0; j < GENE_COUNT; j++) {
+            new_chromosome.genes[j] = new_genes[j];
+        }
+        new_chromosome.fitness = calculate_fitness(new_chromosome);
+        new_population[i] = new_chromosome;
+    }
+    return new_population;
 }
 
 int main(int argc, char **argv) {
