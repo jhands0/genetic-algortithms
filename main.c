@@ -5,6 +5,7 @@
 
 #define GENE_COUNT          3
 #define POPULATION_SIZE     100
+#define GENERATIONS         750
 #define TOURNAMENT_SIZE     10
 #define CROSSOVER_CHANCE    0.7
 #define MUTATION_CHANCE     0.3
@@ -82,12 +83,12 @@ Chromosome get_best_chromosome(Chromosome *population, int size) {
 Chromosome *tournament_selection(Chromosome *population) {
     Chromosome *new_population = (Chromosome*) calloc(POPULATION_SIZE, sizeof(Chromosome));
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        Chromosome tournament_chromasomes[TOURNAMENT_SIZE];
+        Chromosome tournament_chromosomes[TOURNAMENT_SIZE];
         for (int t = 0; t < TOURNAMENT_SIZE; t++) {
             int index = random_int(0, POPULATION_SIZE);
-            tournament_chromasomes[t] = population[index];
+            tournament_chromosomes[t] = population[index];
         }
-        new_population[i] = get_best_chromosome(tournament_chromasomes, TOURNAMENT_SIZE);
+        new_population[i] = get_best_chromosome(tournament_chromosomes, TOURNAMENT_SIZE);
     }
     return new_population;
 }
@@ -157,4 +158,5 @@ int main(int argc, char **argv) {
     fprintf(out_file, "AVERAGE\tBEST\n");
 
     Chromosome *population = generate_population();
+
 }
