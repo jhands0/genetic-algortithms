@@ -50,8 +50,8 @@ void printf_chromosome(Chromosome chromosome) {
 Chromosome *generate_population() {
     Chromosome *chromosomes = (Chromosome*) calloc(POPULATION_SIZE, sizeof(Chromosome));
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        for (int j = 0; j < GENE_COUNT; j++) {
-            chromosomes[i].genes[j] = random_double(LOW, HIGH);
+        for (int g = 0; g < GENE_COUNT; g++) {
+            chromosomes[i].genes[g] = random_double(LOW, HIGH);
         }
         chromosomes[i].id = i;
         chromosomes[i].fitness = calculate_fitness(chromosomes[i]);
@@ -100,22 +100,22 @@ Chromosome *uniform_crossover(Chromosome *population) {
         if (random_double(0., 1.) < CROSSOVER_CHANCE) {
             double genes_1[GENE_COUNT];
             double genes_2[GENE_COUNT];
-            for (int j = 0; j < GENE_COUNT; j++) {
+            for (int g = 0; g < GENE_COUNT; g++) {
                 if (random_double(0., 1.) < 0.5) {
-                    genes_1[j] = chr_1.genes[j];
+                    genes_1[g] = chr_1.genes[g];
                 } else {
-                    genes_1[j] = chr_2.genes[j];
+                    genes_1[g] = chr_2.genes[g];
                 }
                 if (random_double(0., 1.) < 0.5) {
-                    genes_2[j] = chr_1.genes[j];
+                    genes_2[g] = chr_1.genes[g];
                 } else {
-                    genes_2[j] = chr_2.genes[j];
+                    genes_2[g] = chr_2.genes[g];
                 }
             }
             Chromosome new_chr_1, new_chr_2;
-            for (int j = 0; j < GENE_COUNT; j++) {
-                new_chr_1.genes[j] = genes_1[j];
-                new_chr_2.genes[j] = genes_2[j];
+            for (int g = 0; g < GENE_COUNT; g++) {
+                new_chr_1.genes[g] = genes_1[g];
+                new_chr_2.genes[g] = genes_2[g];
             }
             new_chr_1.fitness = calculate_fitness(new_chr_1);
             new_chr_2.fitness = calculate_fitness(new_chr_2);
@@ -133,17 +133,17 @@ Chromosome *gaussian_mutation(Chromosome *population) {
     Chromosome *new_population = (Chromosome*) calloc(POPULATION_SIZE, sizeof(Chromosome));
     for (int i = 0; i < POPULATION_SIZE; i++) {
         double new_genes[GENE_COUNT];
-        for (int j = 0; j < GENE_COUNT; j++) {
-            double old_gene = population[i].genes[j];
+        for (int g = 0; g < GENE_COUNT; g++) {
+            double old_gene = population[i].genes[g];
             if (random_double(0., 1.) < MUTATION_CHANCE) {
-                new_genes[j] = old_gene + normal_distribution() * 0.1 * (HIGH - LOW);
+                new_genes[g] = old_gene + normal_distribution() * 0.1 * (HIGH - LOW);
             } else {
-                new_genes[j] = old_gene;
+                new_genes[g] = old_gene;
             }
         }
         Chromosome new_chromosome;
-        for (int j = 0; j < GENE_COUNT; j++) {
-            new_chromosome.genes[j] = new_genes[j];
+        for (int g = 0; g < GENE_COUNT; g++) {
+            new_chromosome.genes[g] = new_genes[g];
         }
         new_chromosome.fitness = calculate_fitness(new_chromosome);
         new_population[i] = new_chromosome;
