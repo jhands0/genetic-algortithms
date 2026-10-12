@@ -28,7 +28,6 @@ double normal_distribution() {
 }
 
 typedef struct {
-    int id;
     double genes[GENE_COUNT];
     double fitness;
 } Chromosome;
@@ -45,7 +44,7 @@ double calculate_fitness(Chromosome chromosome) {
 }
 
 void printf_chromosome(Chromosome chromosome) {
-    printf("%d: %lf : %lf, %lf, %lf\n", chromosome.id, chromosome.fitness, chromosome.genes[0], chromosome.genes[1], chromosome.genes[2]);
+    printf("%lf : %lf, %lf, %lf\n", chromosome.fitness, chromosome.genes[0], chromosome.genes[1], chromosome.genes[2]);
 }
 
 Chromosome *generate_population() {
@@ -54,7 +53,6 @@ Chromosome *generate_population() {
         for (int g = 0; g < GENE_COUNT; g++) {
             chromosomes[i].genes[g] = random_double(LOW, HIGH);
         }
-        chromosomes[i].id = i;
         chromosomes[i].fitness = calculate_fitness(chromosomes[i]);
     }
     return chromosomes;
@@ -159,4 +157,5 @@ int main(int argc, char **argv) {
 
     Chromosome *population = generate_population();
 
+    
 }
