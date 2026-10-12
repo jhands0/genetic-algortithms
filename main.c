@@ -58,7 +58,7 @@ Chromosome *generate_population() {
     return chromosomes;
 }
 
-Chromosome get_average_fitness(Chromosome *population) {
+double get_average_fitness(Chromosome *population) {
     double average = 0;
     for (int i = 0; i < POPULATION_SIZE; i++) {
         average = average + population[i].fitness;
@@ -157,5 +157,23 @@ int main(int argc, char **argv) {
 
     Chromosome *population = generate_population();
 
-    
+    for (int i = 0; i < GENERATIONS; i++) {
+        Chromosome* tournament_chromosomes = tournament_selection(population);
+        Chromosome* crossover_chromosomes = uniform_crossover(tournament_chromosomes);
+        Chromosome* mutated_chromosomes = gaussian_mutation(crossover_chromosomes);
+
+        Chromosome best = get_best_chromosome(mutated_chromosomes, POPULATION_SIZE);
+
+        for (int j = 0; j < POPULATION_SIZE; j++) {
+            population[j] = mutated_chromosomes[j];
+        }
+        fprintf(out_file, "%lf\t%lf\n", get_average_fitness(population), best.fitness);
+    }
+
+    Chromosome best = get_best_chromosome(population, POPULATION_SIZE);
+    printf_chromosome(best);
+    printf("%lf", calculate_function(best));
+    free(population);
+
+    return 0;
 }
